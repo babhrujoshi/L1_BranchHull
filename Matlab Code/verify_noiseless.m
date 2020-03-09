@@ -1,12 +1,11 @@
+% this script generates tensor M of size (trials, L, N) where 
+% trials is the number of trials for each (L,N). This checks the recovery
+% performace in the noiseless case.
 
-tstart = tic;
-% input parameters
-
-%M = zeros(10,15,15);
 for L = 4:4:140
     for N = 20:20:300
         K = N;
-        for i = 1:1    
+        for i = 1:10    
             % generate data
             B = randn(L,N)/sqrt(L);
             C = randn(L,K)/sqrt(L);
@@ -42,10 +41,7 @@ for L = 4:4:140
             params.rho = 1;
             params.maxIter = 100000;
             
-            %[h,m,xi] = ADMM_l1_branchHull(B,C,y,t,h_hat,m_hat);%
             [h,m] = L1BH_ADMM_noslack(B,C,y,t,h_hat,m_hat,params);
-            
-
             
             error = (norm(h-h_hat)^2 + norm(m-m_hat)^2)^(1/2);
             M(i,cast(35-(L-4)/4,'int8'),cast((N-20)/20+1,'int8')) = error;
@@ -54,8 +50,3 @@ for L = 4:4:140
         fprintf('total success for L = %d, N =K = %d and Sm = Sh = %d is %d\n',L,K,Sm,mean_error); 
     end
 end
-
-        %     max_ksi = 0;%min(abs(yo));
-        %     t = .9;%rand(L,1);
-        %     ksi = t*max_ksi;
-        %     fprintf('norm of noise is %e\n',norm(ksi,2))  

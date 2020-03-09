@@ -1,19 +1,21 @@
+% this script outputs the undistorted image of the mousepad in the paper.
 
-% read the distorted image and resize it for processing
+% load the figure and resize it
 I_unt = imread('PS37_illum.jpg');
 I_unt = rgb2gray(I_unt);
 I_unt = imresize(I_unt,.04);
 I = im2double(I_unt);
 [row,col] = size(I);
 
-% 
+
 p = row;
 q = col;
 L = p*q;
+
+% use the Identity matrix as the dictionary for the mouspad 
 B = speye(L,L);
 
-N1 = 200;
-N2 = 200;
+% use 400 columns of DCT matrix as the dictionary for the distortion
 N = 400;
 C = ones(L,N);
 temp = dctmtx(p);
@@ -26,32 +28,10 @@ for i = 1:N-1
     C(:,i+1) = kron(temp(:,a+1),ones(p,1)).*repmat(temp(:,b+1),p,1);
 end
 
-% g = linspace(-9,4,L)';
-% C1 = ones(L,N1);
-% rng(1);
-% for i = 2:N1
-%    C1(:,i) = besselj(g/(6+.1*abs(randn))+5*abs(randn),.1+10*abs(randn)); 
-% end
-% C2 = ones(L,N1);
-% rng(1);
-% for i = 2:N1
-%    C2(:,i) = besselj(g/(6+.1*abs(randn))+5*abs(randn),.1+10*abs(randn)); 
-% end
-% C2_temp = zeros(p*q,N1); 
-% for i = 0:p*q-1
-%         C2_temp(floor(i/p)+1+mod(i,p)*p,:) = C2(i+1,:);
-% end
-% keyboard
-% C2 = C2_temp;
-% 
-% C = [C1,C2];
-% C(:,1) = max(C(:,2))*C(:,1);
-
-% C(:,1) = max(C(:,2))*C(:,1);
-
-
+% normalize the dictionaries so that they are of equal weight
 C = C*norm(B,'fro')/norm(C,'fro');
 
+% parameters for the TVL1_BH program
 params.lambda = 1000;
 params.rho = 7e-4;
 params.maxIter = 10000;%64000;
@@ -69,4 +49,9 @@ what = B*h_hat;
 xhat = C*m_hat;
 yhat = xhat.*what;
 h =reshape(what,p,q);
+
+% output the clean image
 imshow(h)
+
+
+

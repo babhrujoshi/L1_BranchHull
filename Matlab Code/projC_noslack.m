@@ -1,5 +1,5 @@
 function [x, w] = projC_noslack(xp, wp, y, t)
-% function [x, w, xi] = projC(xp, wp, y, t)
+% function [x, w] = projC(xp, wp, y, t)
 % projects a vector in the form of (xp,wp) in R^{2L} onto the set C
 % defined in the paper. In this function all inputs should have identical
 % sizes of L-by-1
